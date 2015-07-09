@@ -49,10 +49,9 @@
            initOptions.transport.parameterMap = function(data, type) {
                var sortParams = arrayify(data.sort);
 
-               var esParams = {
-                   from: data.skip,
-                   size: data.take
-               };
+               var esParams = {};
+               if (data.skip) esParams.from = data.skip;
+               if (data.take) esParams.size = data.take;
 
                if (sortParams.length > 0)
                    esParams.sort = self._esFieldMap[sortParams[0].field] + ":" + sortParams[0].dir;
