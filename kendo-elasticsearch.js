@@ -1,3 +1,4 @@
+
 /**
  * A Kendo DataSource that gets its data from ElasticSearch.
  *
@@ -72,7 +73,18 @@
 
                    dataItem.id = hits[i]._id;
                    for (var k in self._esFieldMap) {
-                       dataItem[k] = hitSource[self._esFieldMap[k]];
+						var nameSplit = self._esFieldMap[k].split(".");
+						if (nameSplit.length > 1) {
+							var temp = hitSource;
+							for (var l in nameSplit) {
+								temp = temp[nameSplit[l]];
+								if (temp == undefined)
+									break;
+							}
+							dataItem[k] = temp;
+						}	
+						else
+							dataItem[k] = hitSource[self._esFieldMap[k]];
                    }
 
                    dataItems.push(dataItem);
