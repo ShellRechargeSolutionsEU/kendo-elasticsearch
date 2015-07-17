@@ -13,15 +13,16 @@ Here is an example HTML file defining a Kendo grid talking to ElasticSearch:
 <html>
   <head>
 	<title>ElasticSearch Kendo DataSource example</title>
-	<link href="kendo.common.min.css" rel="stylesheet">
+    <link href="http://cdn.kendostatic.com/2014.1.318/styles/kendo.common.min.css" rel="stylesheet">
+	<link href="http://cdn.kendostatic.com/2014.1.318/styles/kendo.default.min.css" rel="stylesheet">
 
-	<!-- Include dependencies -->
-	<script src="moment.min.js"></script>
-	<script src="jquery.min.js"></script>
-	<script src="kendo.web.min.js"></script>
+    <!-- Include dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://cdn.kendostatic.com/2014.1.318/js/kendo.web.min.js"></script>
 
-	<!-- Include kendo-elasticsearch itself -->
-	<script src="kendo-elasticsearch.js"></script>
+    <!-- Include kendo-elasticsearch itself -->
+    <script src="kendo-elasticsearch.js"></script>
   
   </head>
   <body>
@@ -40,6 +41,9 @@ Here is an example HTML file defining a Kendo grid talking to ElasticSearch:
 			  // point it to the URL where ElasticSearch search requests can go
 			  transport: {
 				read: {
+				  //other urls:
+				  // http://localhost:9200/logstash-*/_search/
+				  // http://localhost:9200/index1,index2,index3/_search/
 				  url: "http://localhost:9200/_all/_search/"
 				}
 			  },
@@ -51,10 +55,12 @@ Here is an example HTML file defining a Kendo grid talking to ElasticSearch:
 				model: {
 				  fields: {
 					message: { type: "string" },
+					event_data_timestamp: { type:"datetime", esName:"event.data.timestamp"},
+					other: { type:"string"},
 
 					// you can specify a different ElasticSearch name for the field,
 					// to deal with ElasticSearch field names that Kendo can't handle
-					timestamp: { type: "date", esName: "@timestamp" }
+					timestamp: { type: "datetime", esName: "@timestamp" }
 				  }
 				}
 			  },
@@ -62,7 +68,15 @@ Here is an example HTML file defining a Kendo grid talking to ElasticSearch:
 			  // server-side paging, filtering and sorting are enabled by default.
 			  // Set filters as you like
 			  sort: { field: "timestamp", dir: "desc" },
-			  filter: { field: "message", operator: "eq", value: "accepted" }
+			  filter: 	[	
+							{
+								"logic":"and",
+								"filters":[
+									{ field: "message", operator: "eq", value: "accepted" },
+									{ field: "other", operator: "neq", value: "0" }
+								]
+							}
+						]
 			}),
 
 			// other grid options besides the datasource
@@ -71,7 +85,9 @@ Here is an example HTML file defining a Kendo grid talking to ElasticSearch:
 			filterable: true,
 			columns: [
 			  { field: "timestamp" },
-			  { field: "message" }
+			  { field: "message" },
+			  { field: "event_data_timestamp"},
+			  { field: "other"}
 			]
 		  });
 		});
