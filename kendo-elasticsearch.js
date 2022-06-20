@@ -77,8 +77,14 @@
 
                    dataItems.push(dataItem);
                }
+
+               var total_f = response.hits.total
+               if ("value" in response.hits.total) {
+                 total_f = response.hits.total.value
+               }
+
                return {
-                   total: response.hits.total,
+                   total: total_f,
                    data: dataItems
                };
            };
